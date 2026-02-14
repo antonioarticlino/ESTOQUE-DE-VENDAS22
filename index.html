@@ -15,6 +15,7 @@ body {
 }
 
 header {
+  
   background: #1e293b;
   padding: 20px;
   display: flex;
@@ -121,6 +122,16 @@ button.painel-btn:hover {
   <h1>Catálogo de Peças</h1>
 
   <div style="display: flex; align-items: center; gap: 10px;">
+
+<input 
+  type="text" 
+  id="pesquisa" 
+  placeholder="Pesquisar por nome..." 
+  onkeyup="filtrarProdutos()"
+  style="padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white;"
+>
+
+
     <select id="filtroCategoria" onchange="filtrarCategoria()">
       <option value="">Todas categorias</option>
       <option value="Placa-mãe">Placa-mãe</option>
