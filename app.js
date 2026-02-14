@@ -364,3 +364,66 @@ window.filtrarCategoria = async function() {
   });
 };
 
+window.filtrarProdutos = async function() {
+  const pesquisa = document.getElementById("pesquisa").value.toLowerCase();
+  const categoriaSelecionada = document.getElementById("filtroCategoria").value;
+  const produtosDiv = document.getElementById("produtos");
+  produtosDiv.innerHTML = "";
+
+  const querySnapshot = await getDocs(collection(db, "produtos"));
+
+  querySnapshot.forEach((documento) => {
+    const produto = documento.data();
+    const id = documento.id;
+
+    // Verifica categoria
+    const categoriaMatch = categoriaSelecionada === "" || produto.categoria === categoriaSelecionada;
+
+    // Verifica pesquisa por nome
+    const nomeMatch = produto.nome.toLowerCase().includes(pesquisa);
+
+    if (categoriaMatch && nomeMatch) {
+      let imagensHTML = "";
+      if (produto.imagens && produto.imagens.length > 0) {
+        produto.imagens.forEach(img => {
+          imagensHTML += `
+            <div style="position: relative; display: inline-block; margin-right: 5px;">
+              <a href="${img}" target="_blank"><img src="${img}" alt="${produto.nome}" style="width:100px;height:100px;object-fit:cover;border-radius:4px;"></a>
+              <button style="
+                position: absolute;
+                bottom: 2px;
+                right: 2px;
+                font-size: 10px;
+                padding: 2px 4px;
+                border: none;
+                border-radius: 4px;
+                background: rgba(0,0,0,0.6);
+                color: white;
+                cursor: pointer;
+              " onclick="navigator.clipboard.writeText('${img}'); alert('URL copiada!')">
+                Copiar URL
+              </button>
+            </div>
+          `;
+        });
+      }
+
+      produtosDiv.innerHTML += `
+        <div class="card" data-id="${id}">
+          <div class="imagens-container">
+            ${imagensHTML}
+          </div>
+          <h3>${produto.nome}</h3>
+          <p class="categoria">${produto.categoria}</p>
+          <p class="descricao">${(produto.descricao || "").replace(/\n/g, "<br>")}</p>
+          <div class="preco">R$ ${produto.preco}</div>
+          <div class="botoes" style="margin-top:10px;">
+            <button class="btn-editar" onclick="ativarEdicao('${id}')">✏️ Editar</button>
+            <button class="btn-salvar" onclick="salvarEdicao('${id}')">💾 Salvar</button>
+            <button class="btn-excluir" onclick="excluirProduto('${id}')">🗑 Excluir</button>
+          </div>
+        </div>
+      `;
+    }
+  });
+};
