@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catálogo de Peças</title>
+
+<style>
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #0f172a;
+  color: white;
+}
+
+header {
+  background: #1e293b;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+h1 {
+  margin: 0;
+}
+
+select {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: white;
+}
+
+select:focus {
+  outline: none;
+  border: 1px solid #3b82f6;
+}
+
+button.painel-btn {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: none;
+  background: #3b82f6;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+button.painel-btn:hover {
+  background: #2563eb;
+}
+
+#produtos {
+  padding: 30px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.card {
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 25px rgba(59,130,246,0.6);
+}
+
+.imagens-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.imagens-container img {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.imagens-container img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.card h3 {
+  margin: 10px 0 5px 0;
+}
+
+.card p {
+  font-size: 14px;
+  color: #cbd5e1;
+}
+
+.preco {
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 10px;
+  color: #3b82f6;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Catálogo de Peças</h1>
+
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <select id="filtroCategoria" onchange="filtrarCategoria()">
+      <option value="">Todas categorias</option>
+      <option value="Placa-mãe">Placa-mãe</option>
+      <option value="Processador">Processador</option>
+      <option value="Memória RAM">Memória RAM</option>
+      <option value="Kit">Kit</option>
+      <option value="Resfriadores">Resfriadores</option>
+      <option value="PC">PC</option>
+      <option value="Teclado">Teclado</option>
+      <option value="Mouse">Mouse</option>
+      <option value="Monitor">Monitor</option>
+      <option value="Headset">Headset</option>
+      <option value="Armazenamento">Armazenamento</option>
+      <option value="Placa de Vídeo">Placa de Vídeo</option>
+      <option value="Fonte">Fonte</option>
+      <option value="Gabinete">Gabinete</option>
+      <option value="Outros">Outros</option>
+    </select>
+
+    <!-- Botão para ir ao painel -->
+    <button class="painel-btn" onclick="window.location.href='painel.html'">Painel</button>
+  </div>
+</header>
+
+<div id="produtos"></div>
+
+<script type="module" src="app.js"></script>
+
+</body>
+</html>
