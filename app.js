@@ -1,4 +1,7 @@
+// Firebase App
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+// Firebase Firestore
 import { 
   getFirestore, 
   collection, 
@@ -6,8 +9,12 @@ import {
   getDocs, 
   deleteDoc, 
   doc, 
-  updateDoc 
+  updateDoc,
+  query,
+  orderBy,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyDtmu5yKt5Kz8yxzTCCf5MfC2av1O5zL2Q",
@@ -60,14 +67,14 @@ window.salvarProduto = async function() {
       urlsImagens.push(url);
     }
 
-    await addDoc(collection(db, "produtos"), {
-      nome,
-      categoria,
-      preco,
-      descricao,
-      imagens: urlsImagens,
-      criadoEm: new Date()
-    });
+await addDoc(collection(db, "produtos"), {
+  nome,
+  categoria,
+  preco,
+  descricao,
+  imagens: urlsImagens,
+  criadoEm: serverTimestamp()
+});
 
     alert("Produto salvo com sucesso!");
     carregarProdutos();
@@ -93,7 +100,13 @@ async function carregarProdutos() {
   const produtosDiv = document.getElementById("produtos");
   if (!produtosDiv) return;
 
-  const querySnapshot = await getDocs(collection(db, "produtos"));
+  const q = query(
+    collection(db, "produtos"),
+    orderBy("criadoEm", "asc")
+  );
+
+  const querySnapshot = await getDocs(q);
+
   produtosDiv.innerHTML = "";
 
   querySnapshot.forEach((documento) => {
@@ -105,21 +118,9 @@ async function carregarProdutos() {
       produto.imagens.forEach(img => {
         imagensHTML += `
           <div style="position: relative; display: inline-block; margin-right: 5px;">
-            <a href="${img}" target="_blank"><img src="${img}" alt="${produto.nome}" style="width:100px;height:100px;object-fit:cover;border-radius:4px;"></a>
-            <button style="
-              position: absolute;
-              bottom: 2px;
-              right: 2px;
-              font-size: 10px;
-              padding: 2px 4px;
-              border: none;
-              border-radius: 4px;
-              background: rgba(0,0,0,0.6);
-              color: white;
-              cursor: pointer;
-            " onclick="navigator.clipboard.writeText('${img}'); alert('URL copiada!')">
-              Copiar URL
-            </button>
+            <a href="${img}" target="_blank">
+              <img src="${img}" alt="${produto.nome}" style="width:100px;height:100px;object-fit:cover;border-radius:4px;">
+            </a>
           </div>
         `;
       });
@@ -427,3 +428,4 @@ window.filtrarProdutos = async function() {
     }
   });
 };
+
