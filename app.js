@@ -70,11 +70,20 @@ window.salvarProduto = async function() {
 await addDoc(collection(db, "produtos"), {
   nome,
   categoria,
-  preco,
+  preco: parseFloat(preco), // importante salvar como número
   descricao,
   imagens: urlsImagens,
-  criadoEm: serverTimestamp()
+  criadoEm: serverTimestamp(),
+
+  promocao: {
+    ativo: false,
+    desconto: 0,
+    dataInicio: null,
+    dataFim: null
+  }
+
 });
+
 
     alert("Produto salvo com sucesso!");
     carregarProdutos();
@@ -141,6 +150,8 @@ async function carregarProdutos() {
           <button class="btn-editar" onclick="ativarEdicao('${id}')">✏️ Editar</button>
           <button class="btn-salvar" onclick="salvarEdicao('${id}')">💾 Salvar</button>
           <button class="btn-excluir" onclick="excluirProduto('${id}')">🗑 Excluir</button>
+          <button onclick="abrirPromocao('${id}')">🔥 Promoção</button>
+
         </div>
       </div>
     `;
@@ -429,3 +440,48 @@ window.filtrarProdutos = async function() {
   });
 };
 
+let produtoPromoId = null;
+
+window.abrirPromocao = async function(id) {
+
+  produtoPromoId = id;
+
+  const docSnap = await getDocs(collection(db, "produtos"));
+
+  docSnap.forEach((documento) => {
+    if (documento.id === id) {
+      const produto = documento.data();
+
+      if (produto.promocao) {
+        document.getElementById("promoAtiva").checked = produto.promocao.ativo;
+        document.getElementById("promoDesconto").value = produto.promocao.desconto;
+        document.getElementById("promoInicio").value = produto.promocao.dataInicio || "";
+        document.getElementById("promoFim").value = produto.promocao.dataFim || "";
+      }
+    }
+  });
+
+  document.getElementById("modalPromocao").style.display = "flex";
+};
+
+window.fecharPromocao = function() {
+  document.getElementById("modalPromocao").style.display = "none";
+};
+
+window.salvarPromocao = async function() {
+
+  const promocao = {
+    ativo: document.getElementById("promoAtiva").checked,
+    desconto: parseFloat(document.getElementById("promoDesconto").value) || 0,
+    dataInicio: document.getElementById("promoInicio").value || null,
+    dataFim: document.getElementById("promoFim").value || null
+  };
+
+  await updateDoc(doc(db, "produtos", produtoPromoId), {
+    promocao
+  });
+
+  alert("Promoção salva!");
+  fecharPromocao();
+  carregarProdutos();
+};
