@@ -113,8 +113,56 @@ button.painel-btn:hover {
   color: #3b82f6;
 }
 
+
+
+
 </style>
 </head>
+<div id="modalPromocao" style="
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.6);
+align-items:center;
+justify-content:center;
+z-index:9999;
+">
+
+  <div style="
+    background:#1e293b;
+    padding:25px;
+    border-radius:12px;
+    width:350px;
+  ">
+    <h3>Configurar Promoção</h3>
+
+    <label>
+      <input type="checkbox" id="promoAtiva">
+      Ativar promoção
+    </label>
+
+    <br><br>
+
+    <input type="number" id="promoDesconto" placeholder="Desconto (%)"
+      style="width:100%;padding:8px;margin-bottom:10px;border-radius:8px;">
+
+    <input type="datetime-local" id="promoInicio"
+      style="width:100%;padding:8px;margin-bottom:10px;border-radius:8px;">
+
+    <input type="datetime-local" id="promoFim"
+      style="width:100%;padding:8px;margin-bottom:10px;border-radius:8px;">
+
+    <button onclick="salvarPromocao()"
+      style="width:100%;padding:10px;border:none;border-radius:8px;background:#3b82f6;color:white;">
+      Salvar
+    </button>
+
+    <button onclick="fecharPromocao()"
+      style="width:100%;padding:10px;border:none;border-radius:8px;background:#ef4444;color:white;margin-top:8px;">
+      Cancelar
+    </button>
+  </div>
+</div>
 
 <body>
 
