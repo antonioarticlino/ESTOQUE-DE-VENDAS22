@@ -75,14 +75,16 @@ await addDoc(collection(db, "produtos"), {
   imagens: urlsImagens,
   criadoEm: serverTimestamp(),
 
+  vendido: false, // 🔹 NOVO CAMPO: começa como "não vendido"
+
   promocao: {
     ativo: false,
     desconto: 0,
     dataInicio: null,
     dataFim: null
   }
-
 });
+
 
 
     alert("Produto salvo com sucesso!");
@@ -146,13 +148,18 @@ async function carregarProdutos() {
         <p class="descricao">${(produto.descricao || "").replace(/\n/g, "<br>")}</p>
         <div class="preco">R$ ${produto.preco}</div>
 
-        <div class="botoes" style="margin-top:10px;">
-          <button class="btn-editar" onclick="ativarEdicao('${id}')">✏️ Editar</button>
-          <button class="btn-salvar" onclick="salvarEdicao('${id}')">💾 Salvar</button>
-          <button class="btn-excluir" onclick="excluirProduto('${id}')">🗑 Excluir</button>
-          <button onclick="abrirPromocao('${id}')">🔥 Promoção</button>
+<div class="botoes" style="margin-top:10px;">
+  <button class="btn-editar" onclick="ativarEdicao('${id}')">✏️ Editar</button>
+  <button class="btn-salvar" onclick="salvarEdicao('${id}')">💾 Salvar</button>
+  <button class="btn-excluir" onclick="excluirProduto('${id}')">🗑 Excluir</button>
+  <button onclick="abrirPromocao('${id}')">🔥 Promoção</button>
+  <button 
+    onclick="marcarVendido('${id}')" 
+    style="background:#ef4444;color:white;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;">
+    ${produto.vendido ? "Desmarcar" : "Vendido"}
+  </button>
+</div>
 
-        </div>
       </div>
     `;
   });
@@ -483,5 +490,72 @@ window.salvarPromocao = async function() {
 
   alert("Promoção salva!");
   fecharPromocao();
+  carregarProdutos();
+};
+// Abrir modal para promoção por categoria
+window.abrirPromocaoCategoria = function() {
+  // Limpar campos
+  document.getElementById("promoAtiva").checked = true;
+  document.getElementById("promoDesconto").value = "";
+  document.getElementById("promoInicio").value = "";
+  document.getElementById("promoFim").value = "";
+  document.getElementById("categoriaPromo").value = "";
+
+  document.getElementById("modalPromocao").style.display = "flex";
+};
+window.salvarPromocaoCategoria = async function() {
+  const ativa = document.getElementById("promoAtiva").checked;
+  const desconto = parseFloat(document.getElementById("promoDesconto").value) || 0;
+  const inicio = document.getElementById("promoInicio").value;
+  const fim = document.getElementById("promoFim").value;
+  const categoria = document.getElementById("categoriaPromo").value;
+
+  if (!categoria) {
+    alert("Selecione uma categoria!");
+    return;
+  }
+
+  const produtosSnapshot = await getDocs(collection(db, "produtos"));
+  const updates = [];
+
+  produtosSnapshot.forEach((docSnap) => {
+    const produto = docSnap.data();
+    if (produto.categoria === categoria) {
+      const promocao = ativa
+        ? {
+            ativo: true,
+            desconto: desconto,
+            dataInicio: inicio,
+            dataFim: fim
+          }
+        : { ativo: false, desconto: 0, dataInicio: null, dataFim: null };
+
+      updates.push(updateDoc(doc(db, "produtos", docSnap.id), { promocao }));
+    }
+  });
+
+  await Promise.all(updates);
+
+  alert(`Promoção aplicada na categoria "${categoria}"!`);
+  document.getElementById("modalPromocao").style.display = "none";
+  carregarProdutos();
+};
+
+window.marcarVendido = async function(id) {
+  const docRef = doc(db, "produtos", id);
+  const docSnap = await getDocs(collection(db, "produtos"));
+  let produtoAtual;
+
+  docSnap.forEach(d => {
+    if (d.id === id) produtoAtual = d.data();
+  });
+
+  if (!produtoAtual) return;
+
+  await updateDoc(docRef, {
+    vendido: !produtoAtual.vendido
+  });
+
+  alert(produtoAtual.vendido ? "Produto desmarcado!" : "Produto marcado como vendido!");
   carregarProdutos();
 };
