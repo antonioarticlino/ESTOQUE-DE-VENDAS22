@@ -117,7 +117,6 @@ async function carregarProdutos() {
   );
 
   const querySnapshot = await getDocs(q);
-
   produtosDiv.innerHTML = "";
 
   querySnapshot.forEach((documento) => {
@@ -126,12 +125,36 @@ async function carregarProdutos() {
 
     let imagensHTML = "";
     if (produto.imagens && produto.imagens.length > 0) {
-      produto.imagens.forEach(img => {
+      produto.imagens.forEach((img, index) => {
         imagensHTML += `
           <div style="position: relative; display: inline-block; margin-right: 5px;">
-            <a href="${img}" target="_blank">
-              <img src="${img}" alt="${produto.nome}" style="width:100px;height:100px;object-fit:cover;border-radius:4px;">
-            </a>
+            <img src="${img}" alt="${produto.nome}" style="width:100px;height:100px;object-fit:cover;border-radius:4px;">
+            
+            <button style="
+              position: absolute;
+              top: 2px;
+              left: 2px;
+              font-size: 10px;
+              padding: 2px 4px;
+              border: none;
+              border-radius: 4px;
+              background: rgba(0,0,0,0.6);
+              color: white;
+              cursor: pointer;
+            " onclick="substituirImagem('${id}', ${index})">Trocar</button>
+
+            <button style="
+              position: absolute;
+              top: 2px;
+              right: 2px;
+              font-size: 10px;
+              padding: 2px 4px;
+              border: none;
+              border-radius: 4px;
+              background: rgba(255,0,0,0.7);
+              color: white;
+              cursor: pointer;
+            " onclick="removerImagem('${id}', ${index})">❌</button>
           </div>
         `;
       });
@@ -148,22 +171,22 @@ async function carregarProdutos() {
         <p class="descricao">${(produto.descricao || "").replace(/\n/g, "<br>")}</p>
         <div class="preco">R$ ${produto.preco}</div>
 
-<div class="botoes" style="margin-top:10px;">
-  <button class="btn-editar" onclick="ativarEdicao('${id}')">✏️ Editar</button>
-  <button class="btn-salvar" onclick="salvarEdicao('${id}')">💾 Salvar</button>
-  <button class="btn-excluir" onclick="excluirProduto('${id}')">🗑 Excluir</button>
-  <button onclick="abrirPromocao('${id}')">🔥 Promoção</button>
-  <button 
-    onclick="marcarVendido('${id}')" 
-    style="background:#ef4444;color:white;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;">
-    ${produto.vendido ? "Desmarcar" : "Vendido"}
-  </button>
-</div>
-
+        <div class="botoes" style="margin-top:10px;">
+          <button class="btn-editar" onclick="ativarEdicao('${id}')">✏️ Editar</button>
+          <button class="btn-salvar" onclick="salvarEdicao('${id}')">💾 Salvar</button>
+          <button class="btn-excluir" onclick="excluirProduto('${id}')">🗑 Excluir</button>
+          <button onclick="abrirPromocao('${id}')">🔥 Promoção</button>
+          <button 
+            onclick="marcarVendido('${id}')" 
+            style="background:#ef4444;color:white;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;">
+            ${produto.vendido ? "Desmarcar" : "Vendido"}
+          </button>
+        </div>
       </div>
     `;
   });
 }
+
 
 // Ativa edição inline
 window.ativarEdicao = function(id) {
@@ -440,6 +463,8 @@ window.filtrarProdutos = async function() {
             <button class="btn-editar" onclick="ativarEdicao('${id}')">✏️ Editar</button>
             <button class="btn-salvar" onclick="salvarEdicao('${id}')">💾 Salvar</button>
             <button class="btn-excluir" onclick="excluirProduto('${id}')">🗑 Excluir</button>
+            <button onclick="adicionarImagem('ID_DO_PRODUTO')">➕ Adicionar Foto</button>
+
           </div>
         </div>
       `;
@@ -558,4 +583,92 @@ window.marcarVendido = async function(id) {
 
   alert(produtoAtual.vendido ? "Produto desmarcado!" : "Produto marcado como vendido!");
   carregarProdutos();
+};
+// Substituir uma imagem específica do produto
+window.substituirImagem = async function(produtoId, index) {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+
+  input.onchange = async function() {
+    const file = input.files[0];
+    if (!file) return;
+
+    const url = await uploadImagem(file); // envia para Cloudinary
+
+    // Pega o produto atual
+    const docRef = doc(db, "produtos", produtoId);
+    const docSnap = await getDocs(collection(db, "produtos"));
+    let produtoAtual;
+    docSnap.forEach(d => {
+      if (d.id === produtoId) produtoAtual = d.data();
+    });
+
+    if (!produtoAtual) return;
+
+    const imagens = produtoAtual.imagens || [];
+    imagens[index] = url; // substitui a imagem
+
+    await updateDoc(docRef, { imagens });
+    alert("Imagem substituída!");
+    carregarProdutos();
+  };
+
+  input.click();
+};
+
+// Remover uma imagem específica do produto
+window.removerImagem = async function(produtoId, index) {
+  if (!confirm("Deseja realmente remover esta imagem?")) return;
+
+  const docRef = doc(db, "produtos", produtoId);
+  const docSnap = await getDocs(collection(db, "produtos"));
+  let produtoAtual;
+  docSnap.forEach(d => {
+    if (d.id === produtoId) produtoAtual = d.data();
+  });
+
+  if (!produtoAtual) return;
+
+  const imagens = produtoAtual.imagens || [];
+  imagens.splice(index, 1); // remove a imagem
+
+  await updateDoc(docRef, { imagens });
+  alert("Imagem removida!");
+  carregarProdutos();
+};
+
+// Adicionar novas imagens a um produto existente
+window.adicionarImagem = async function(produtoId) {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.multiple = true;
+  input.accept = "image/*";
+
+  input.onchange = async function() {
+    if (!input.files.length) return;
+
+    const docRef = doc(db, "produtos", produtoId);
+    const docSnap = await getDocs(collection(db, "produtos"));
+    let produtoAtual;
+    docSnap.forEach(d => {
+      if (d.id === produtoId) produtoAtual = d.data();
+    });
+
+    if (!produtoAtual) return;
+
+    let novasImagens = produtoAtual.imagens || [];
+
+    // Envia cada arquivo para Cloudinary e adiciona à lista
+    for (let i = 0; i < input.files.length; i++) {
+      const url = await uploadImagem(input.files[i]);
+      novasImagens.push(url);
+    }
+
+    await updateDoc(docRef, { imagens: novasImagens });
+    alert("Nova(s) imagem(ns) adicionada(s)!");
+    carregarProdutos();
+  };
+
+  input.click();
 };
