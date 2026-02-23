@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Catálogo de Peças</title>
 
-<style>
+<head>
+  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo de Peças</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+
+  <style>
+
 
 body {
   margin: 0;
@@ -115,8 +122,8 @@ button.painel-btn:hover {
 
 
 
-
 </style>
+
 </head>
 <div id="modalPromocao" style="
 display:none;
@@ -179,26 +186,31 @@ z-index:9999;
   style="padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white;"
 >
 
+<select id="filtroCategoria" onchange="filtrarCategoria()">
+  <option value="">Todas categorias</option>
+  <option value="Placa-mãe">Placa-mãe</option>
+  <option value="Processador">Processador</option>
+  <option value="Memória RAM">Memória RAM</option>
+  <option value="Kit">Kit</option>
+  <option value="Resfriadores">Resfriadores</option>
+  <option value="PC">PC</option>
+  <option value="Teclado">Teclado</option>
+  <option value="Mouse">Mouse</option>
+  <option value="Monitor">Monitor</option>
+  <option value="Headset">Headset</option>
+  <option value="Armazenamento">Armazenamento</option>
+  <option value="Placa de Vídeo">Placa de Vídeo</option>
+  <option value="Fonte">Fonte</option>
+  <option value="Gabinete">Gabinete</option>
+  <option value="Outros">Outros</option>
+</select>
 
-    <select id="filtroCategoria" onchange="filtrarCategoria()">
-      <option value="">Todas categorias</option>
-      <option value="Placa-mãe">Placa-mãe</option>
-      <option value="Processador">Processador</option>
-      <option value="Memória RAM">Memória RAM</option>
-      <option value="Kit">Kit</option>
-      <option value="Resfriadores">Resfriadores</option>
-      <option value="PC">PC</option>
-      <option value="Teclado">Teclado</option>
-      <option value="Mouse">Mouse</option>
-      <option value="Monitor">Monitor</option>
-      <option value="Headset">Headset</option>
-      <option value="Armazenamento">Armazenamento</option>
-      <option value="Placa de Vídeo">Placa de Vídeo</option>
-      <option value="Fonte">Fonte</option>
-      <option value="Gabinete">Gabinete</option>
-      <option value="Outros">Outros</option>
-    </select>
-
+<!-- NOVO FILTRO -->
+<select id="filtroVendido" onchange="filtrarVendido()">
+  <option value="todos">Todos</option>
+  <option value="disponivel">Disponíveis</option>
+  <option value="vendido">Vendidos</option>
+</select>
     <!-- Botão para ir ao painel -->
     <button class="painel-btn" onclick="window.location.href='painel.html'">Painel</button>
   </div>
