@@ -160,8 +160,10 @@ async function carregarProdutos() {
       });
     }
 
-    produtosDiv.innerHTML += `
-      <div class="card" data-id="${id}">
+produtosDiv.innerHTML += `
+  <div class="card" 
+       data-id="${id}" 
+       data-vendido="${produto.vendido}">
         <div class="imagens-container">
           ${imagensHTML}
         </div>
@@ -385,7 +387,9 @@ window.filtrarCategoria = async function() {
 
       // Monta o card completo com editar, salvar e excluir
       produtosDiv.innerHTML += `
-        <div class="card" data-id="${id}">
+    <div class="card" 
+     data-id="${id}" 
+     data-vendido="${produto.vendido}">
           <div class="imagens-container">
             ${imagensHTML}
           </div>
@@ -672,3 +676,28 @@ window.adicionarImagem = async function(produtoId) {
 
   input.click();
 };
+
+window.filtrarVendido = function () {
+  const filtro = document.getElementById("filtroVendido").value;
+  const cards = document.querySelectorAll(".card");
+
+  cards.forEach(card => {
+
+    const vendido = card.getAttribute("data-vendido") === "true";
+
+    if (filtro === "todos") {
+      card.style.display = "block";
+    } 
+    else if (filtro === "vendido" && vendido) {
+      card.style.display = "block";
+    } 
+    else if (filtro === "disponivel" && !vendido) {
+      card.style.display = "block";
+    } 
+    else {
+      card.style.display = "none";
+    }
+
+  });
+};
+
