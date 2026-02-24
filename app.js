@@ -147,10 +147,10 @@ window.salvarProduto = async function() {
     }
 
     let urlsImagens = [];
-    for (let i = 0; i < imagensInput.files.length; i++) {
-      const url = await uploadImagem(imagesInput.files[i]);
-      urlsImagens.push(url);
-    }
+for (let i = 0; i < imagensInput.files.length; i++) {
+  const url = await uploadImagem(imagensInput.files[i]);
+  urlsImagens.push(url);
+}
 
     await addDoc(collection(db, "produtos"), {
       nome, categoria, preco: parseFloat(preco),
